@@ -2,7 +2,7 @@ import customtkinter
 import sqlite3
 import bcrypt
 from tkinter import *
-from tkinter import messagebox
+from tkinter import ttk, messagebox  # Add import for ttk module
 
 app = customtkinter.CTk()
 app.title('Login')
@@ -48,13 +48,98 @@ def login_account():
         result = cursor.fetchone()
         if result:
             if bcrypt.checkpw(password.encode('utf-8'), result[0]):
-                messagebox.showinfo('Success', 'Login successful.')
+                if username == 'admin' and password == '12345':
+                    messagebox.showinfo('Success', 'Login successful.')
+                    show_user_details_window()
+                else:
+                    messagebox.showinfo('Success', 'Login successful.')
             else: 
                 messagebox.showerror('Error', 'Invalid password.')
         else:
             messagebox.showerror('Error', 'Invalid username.')
     else:
         messagebox.showerror('Error', 'Enter all data.')
+
+def show_user_details_window():
+    details_window = Toplevel(app)
+    details_window.title("User Details")
+    details_window.geometry("600x400")
+
+    # Fetch user details from the database
+    cursor.execute('SELECT rowid, username, password FROM users')
+    users = cursor.fetchall()
+
+    # Create a treeview to display the user details
+    tree = ttk.Treeview(details_window, columns=("ID", "Username", "Password"), selectmode="extended")
+    tree.heading('#0', text='ID')
+    tree.heading('#1', text='Username')
+    tree.heading('#2', text='Password')
+
+    # Insert user details into the treeview
+    for user in users:
+        tree.insert("", "end", text=user[0], values=(user[1], user[2]))
+
+    tree.pack(expand=YES, fill=BOTH)
+
+    # Button to edit selected user
+    edit_button = Button(details_window, text="Edit User", command=lambda: edit_user(tree))
+    edit_button.pack()
+
+    # Button to delete selected user
+    delete_button = Button(details_window, text="Delete User", command=lambda: delete_user(tree))
+    delete_button.pack()
+
+def edit_user(tree):
+    # Fetch selected item from the treeview
+    selected_item = tree.selection()
+    if selected_item:
+        # Fetch details of the selected user
+        item = tree.item(selected_item)
+        user_id = item['text']
+        username = item['values'][0]
+        password = item['values'][1]
+
+        # Create a popup window for editing user
+        edit_window = Toplevel()
+        edit_window.title("Edit User")
+        edit_window.geometry("300x200")
+
+        # Labels and entry widgets for editing
+        username_label = Label(edit_window, text="Username:")
+        username_label.grid(row=0, column=0, padx=10, pady=5)
+        username_entry = Entry(edit_window)
+        username_entry.insert(0, username)
+        username_entry.grid(row=0, column=1, padx=10, pady=5)
+
+        password_label = Label(edit_window, text="Password:")
+        password_label.grid(row=1, column=0, padx=10, pady=5)
+        password_entry = Entry(edit_window)
+        password_entry.insert(0, password)
+        password_entry.grid(row=1, column=1, padx=10, pady=5)
+
+        # Button to save changes
+        save_button = Button(edit_window, text="Save Changes", command=lambda: save_changes(tree, user_id, username_entry.get(), password_entry.get()))
+        save_button.grid(row=2, columnspan=2, pady=10)
+
+def save_changes(tree, user_id, new_username, new_password):
+    # Update user details in the database
+    cursor.execute("UPDATE users SET username=?, password=? WHERE rowid=?", (new_username, new_password, user_id))
+    conn.commit()
+
+    # Update details in the treeview
+    item = tree.selection()[0]
+    tree.item(item, values=(new_username, new_password))
+
+def delete_user(tree):
+    # Get selected item from the treeview
+    selected_item = tree.selection()
+    if selected_item:
+        for item in selected_item:
+            # Remove selected item from the treeview
+            tree.delete(item)
+            # Delete corresponding entry from the database
+            cursor.execute("DELETE FROM users WHERE rowid=?", (item,))
+            conn.commit()
 
 def login():
     frame1.destroy()
