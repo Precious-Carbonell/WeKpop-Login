@@ -1,6 +1,3 @@
-#installed pip customtkinter for GUI
-#installed pip bcrypt for hashing
-
 import customtkinter
 import sqlite3
 import bcrypt
@@ -12,10 +9,10 @@ app.title('Login')
 app.geometry('450x360')
 app.config(bg='#001220')
 
-font1= ('Helvetica', 25, 'bold')
-font2= ('Arial', 17, 'bold')
-font3= ('Arial', 13, 'bold')
-font4= ('Arial', 13, 'bold', 'underline')
+font1 = ('Helvetica', 25, 'bold')
+font2 = ('Arial', 17, 'bold')
+font3 = ('Arial', 13, 'bold')
+font4 = ('Arial', 13, 'bold', 'underline')
 
 conn = sqlite3.connect('data.db')
 cursor = conn.cursor()
@@ -35,7 +32,6 @@ def signup():
         else:
             encoded_password = password.encode('utf-8')
             hashed_password = bcrypt.hashpw(encoded_password, bcrypt.gensalt())
-            print(hashed_password)
             cursor.execute('INSERT INTO users VALUES (?, ?)', (username, hashed_password))
             conn.commit()
             messagebox.showinfo('Success', 'Account created successfully.')
@@ -43,6 +39,8 @@ def signup():
         messagebox.showerror('Error', 'Enter all data.')
 
 def login_account():
+    global username_entry, password_entry  # Accessing global variables
+
     username = username_entry.get()
     password = password_entry.get()
     if username != '' and password != '':
@@ -68,19 +66,15 @@ def login():
     image1_label.place (x=0, y=0)
     frame2.image1 = image1
 
-    login_label2= customtkinter.CTkLabel(frame2, font=font1, text = 'Log in', text_color='#FFFFFF', bg_color='#001220')
-    login_label2.place(x=280, y=20)
+    global username_entry, password_entry  # Accessing global variables
 
-    global username_entry2
-    global password_entry2
+    username_entry = customtkinter.CTkEntry(frame2, font=font2, text_color= '#FFFFFF', fg_color='#001a2e', bg_color='#121111', border_color= '#004780', border_width= 3, placeholder_text='Username', placeholder_text_color='#a3a3a3', width= 200, height= 50)
+    username_entry.place(x=230, y=80)
 
-    username_entry2 = customtkinter.CTkEntry(frame2, font=font2, text_color= '#FFFFFF', fg_color='#001a2e', bg_color='#121111', border_color= '#004780', border_width= 3, placeholder_text='Username', placeholder_text_color='#a3a3a3', width= 200, height= 50)
-    username_entry2.place(x=230, y=80)
+    password_entry = customtkinter.CTkEntry(frame2, font=font2, show= '*', text_color= '#FFFFFF', fg_color='#001a2e', bg_color='#121111', border_color= '#004780', border_width= 3, placeholder_text='Password', placeholder_text_color='#a3a3a3', width= 200, height= 50)
+    password_entry.place(x=230, y=150)
 
-    password_entry2 = customtkinter.CTkEntry(frame2, font=font2, show= '*', text_color= '#FFFFFF', fg_color='#001a2e', bg_color='#121111', border_color= '#004780', border_width= 3, placeholder_text='Password', placeholder_text_color='#a3a3a3', width= 200, height= 50)
-    password_entry2.place(x=230, y=150)
-
-    login_button2 = customtkinter.CTkButton(frame2,command=login_account, font=font2, text_color= '#FFFFFF', text= 'Login', fg_color='#00965d', hover_color='#006e44', bg_color= '#121111', cursor='hand2', corner_radius=5, width= 120)
+    login_button2 = customtkinter.CTkButton(frame2, command=login_account, font=font2, text_color= '#FFFFFF', text= 'Login', fg_color='#00965d', hover_color='#006e44', bg_color= '#121111', cursor='hand2', corner_radius=5, width= 120)
     login_button2.place(x=230, y=220)
 
 frame1 = customtkinter.CTkFrame(app, bg_color='#001220', fg_color='#001220', width=470, height=360)
@@ -109,4 +103,3 @@ login_button = customtkinter.CTkButton(frame1, command=login, font=font4, text_c
 login_button.place(x=395, y=250)
 
 app.mainloop()
-
