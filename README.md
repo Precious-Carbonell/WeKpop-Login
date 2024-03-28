@@ -1,12 +1,12 @@
 ## Features
 
-- User registration - Users can sign up by providing a username and password. The password is securely hashed using the bcrypt library before storing it in the database.
+- User registration
 
-- Secure login: Users can log in securely with their registered username and password. Passwords are hashed and compared to the stored hashed passwords for authentication.
+- Secure login 
 
-- User details display: Upon successful login, an admin user (username: admin, password: 12345) can view all registered user details, including usernames and hashed passwords, in a separate window.
+- User details display - an admin user (username: admin, password: 12345) can view all registered user details.
 
-- Edit and delete users: Admin users have the ability to edit and delete user details directly from the user details window. This provides flexibility in managing user accounts.
+- Edit and delete users - an admin user can edit and delete user details directly from the user details window.
 
 ## Install Dependencies
 - pip install bcrypt (for secure pass hashing)
